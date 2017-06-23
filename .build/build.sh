@@ -5,6 +5,8 @@ REPO_ROOT=`dirname "$0"`; REPO_ROOT=`eval "cd \"$REPO_ROOT/..\" && pwd"`
 
 cd $REPO_ROOT
 
+export Version=0.0.1
+
 curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --install-dir .dotnet
 
 dotnet restore
