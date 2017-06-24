@@ -7,6 +7,8 @@ powershell -command "& ([scriptblock]::Create((Invoke-WebRequest -useb 'https://
 
 $env:PATH="$RepoRoot/.dotnet/;"+$env:PATH
 
+$env:Version = $env:APPVEYOR_BUILD_VERSION
+
 dotnet restore
 
 dotnet build
