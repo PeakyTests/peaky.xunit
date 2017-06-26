@@ -1,4 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Authors>PiotrP,PiotrPMSFT,Microsoft</Authors>
+    <Product>Peaky.Client</Product>
+    <Description>.NET Peaky Client. Provides .NET apps read access to Peaky services.</Description>
+    <Copyright>Copyright © Piotr Puszkiewicz. All Rights Reserved.</Copyright>
+    <PackageLicenseUrl>https://github.com/piotrpMSFT/peaky.xunit/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/piotrpMSFT/peaky.xunit/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/piotrpMSFT/peaky.xunit.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
   <PropertyGroup>
     <TargetFramework>netstandard1.4</TargetFramework>
   </PropertyGroup>
