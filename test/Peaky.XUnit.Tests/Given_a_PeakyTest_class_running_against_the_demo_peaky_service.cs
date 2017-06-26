@@ -56,16 +56,16 @@ namespace Peaky.XUnit.Tests
                 .Should().HaveCount(15);
         }
 
-        static Given_a_PeakyTest_class_running_against_the_demo_peaky_service()
-        {
-            if (_testRun != null)
-            {
-                return;
-            }
-
-            GenerateTestRun();
-        }
-
+        static Given_a_PeakyTest_class_running_against_the_demo_peaky_service() 
+        { 
+            if (_testRun != null) 
+            { 
+                return; 
+            } 
+ 
+            GenerateTestRun(); 
+        } 
+        
         private static void GenerateTestRun()
         {
             var trxFileInfo = new FileInfo("Given_a_PeakyTest_class_running_against_the_demo_peaky_service.trx");
