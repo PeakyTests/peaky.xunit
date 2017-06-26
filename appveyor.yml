@@ -6,7 +6,7 @@ configuration:
   - Release
 
 before_build:
-  - cmd: dotnet restore peaky.xunit.sln
+  - cmd: dotnet restore peaky.xunit.sln /p:Version=%APPVEYOR_BUILD_VERSION%
 
 build_script:
   - cmd: >-
