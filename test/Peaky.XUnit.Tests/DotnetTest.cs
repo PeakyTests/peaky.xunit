@@ -37,9 +37,6 @@ namespace Peaky.XUnit.Tests
                 using (Process proc = new Process())
                 {
                     proc.StartInfo = psi;
-                    
-                    proc.BeginOutputReadLine();
-                    proc.BeginErrorReadLine();
 
                     proc.OutputDataReceived += (sender, e) => {
                         if (e.Data == null)
