@@ -13,7 +13,7 @@ namespace Peaky.Sample.Tests
         public override PeakyClient PeakyClient => _peakyClient;
         
 
-        [Theory]
+        [Theory (Skip = "Sample test only")]
         [ClassData(typeof(PeakySampleTests))]
         public async void The_peaky_test_passes(Uri url)
         {

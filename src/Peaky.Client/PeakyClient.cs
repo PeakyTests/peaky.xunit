@@ -26,11 +26,16 @@ namespace Peaky.Client
 
         public async Task<IEnumerable<Test>> GetTests()
         {
-            var response = await _httpClient.GetAsync("/tests");
+            var response = await _httpClient.GetAsync("");
 
             var content = await response.Content.ReadAsStringAsync();
 
             var testResponse = JsonConvert.DeserializeObject<TestsResponse>(content);
+
+            if (testResponse == null)
+            {
+                return Array.Empty<Test>();
+            }
 
             return testResponse.Tests;
         }
