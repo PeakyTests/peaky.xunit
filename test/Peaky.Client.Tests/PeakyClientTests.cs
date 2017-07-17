@@ -156,5 +156,19 @@ namespace Peaky.Client.Tests
                 testResult.Content.Should().Be("hijklmnop");
             }
         }
+
+        [Fact]
+        public async void It_retrieves_no_test_from_Url()
+        {
+            using (var server = new FakeHttpService.FakeHttpService()
+                .WithTestResultAt("/no_test", "hijklmnop", false))
+            {
+                var client = new PeakyClient(new Uri(server.BaseAddress, @"/tests"));
+
+                var test = new Test("", "", new Uri(server.BaseAddress, "/no_test"), null);
+
+                test.Should().Equals(Array.Empty<Test>());
+            }
+        }
     }
 }
