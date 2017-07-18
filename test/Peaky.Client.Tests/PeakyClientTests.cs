@@ -165,9 +165,9 @@ namespace Peaky.Client.Tests
             {
                 var client = new PeakyClient(new Uri(server.BaseAddress, @"/tests"));
 
-                var tests = client.GetTests();
+                var tests = await client.GetTests();
 
-                tests.Should().Equals(Array.Empty<Test>());
+                tests.Should().BeEmpty();
             }
         }
     }
