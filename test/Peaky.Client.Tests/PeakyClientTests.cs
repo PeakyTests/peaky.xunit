@@ -158,16 +158,16 @@ namespace Peaky.Client.Tests
         }
 
         [Fact]
-        public async void It_retrieves_no_test_from_Url()
+        public async void When_the_response_contains_no_peaky_tests_Then_it_returns_an_empty_list()
         {
             using (var server = new FakeHttpService.FakeHttpService()
                 .WithTestResultAt("/no_test", "hijklmnop", false))
             {
                 var client = new PeakyClient(new Uri(server.BaseAddress, @"/tests"));
 
-                var test = new Test("", "", new Uri(server.BaseAddress, "/no_test"), null);
+                var tests = client.GetTests();
 
-                test.Should().Equals(Array.Empty<Test>());
+                tests.Should().Equals(Array.Empty<Test>());
             }
         }
     }
