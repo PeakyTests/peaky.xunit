@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/kf2mh9ecqlpyxmme?svg=true)](https://ci.appveyor.com/project/piotrpMSFT/peaky-xunit)
+/[![Build status](https://ci.appveyor.com/api/projects/status/kf2mh9ecqlpyxmme?svg=true)](https://ci.appveyor.com/project/piotrpMSFT/peaky-xunit)
 [![NuGet Badge](https://buildstats.info/nuget/peaky.xunit?includePreReleases=true)](https://www.nuget.org/packages/peaky.xunit)
 
 
@@ -30,7 +30,7 @@ namespace Peaky.Sample.Tests
 {
     public class PeakySampleTests : PeakyXunitTestBase, IDisposable
     {
-        private readonly PeakyClient _peakyClient = new PeakyClient(new Uri("https://peaky.azurewebsites.net"));
+        private readonly PeakyClient _peakyClient = new PeakyClient(new Uri("https://peaky.azurewebsites.net/tests"));
 
         public override PeakyClient PeakyClient => _peakyClient;
         
@@ -65,7 +65,7 @@ namespace Peaky.Sample.Tests
 {
     public class PeakySampleTests : PeakyXunitTestBase, IDisposable
     {
-        private readonly PeakyClient _peakyClient = new PeakyClient(new Uri("https://peaky.azurewebsites.net/prod"));
+        private readonly PeakyClient _peakyClient = new PeakyClient(new Uri("https://peaky.azurewebsites.net/tests/prod"));
 
         public override PeakyClient PeakyClient => _peakyClient;
         
