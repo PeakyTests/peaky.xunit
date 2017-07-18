@@ -8,7 +8,7 @@ namespace Peaky.Sample.Tests
 {
     public class PeakySampleTests : PeakyXunitTestBase, IDisposable
     {
-        private readonly PeakyClient _peakyClient = new PeakyClient(new Uri("https://peaky.azurewebsites.net"));
+        private readonly PeakyClient _peakyClient = new PeakyClient(new Uri("https://peaky.azurewebsites.net/tests"));
 
         public override PeakyClient PeakyClient => _peakyClient;
         
