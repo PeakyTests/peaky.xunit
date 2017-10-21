@@ -1,7 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="TestResults\**" />
+    <EmbeddedResource Remove="TestResults\**" />
+    <None Remove="TestResults\**" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FakeHttpService">
       <Version>0.1.17</Version>
@@ -17,7 +22,7 @@
     <ProjectReference Include="..\..\src\Peaky.Client\Peaky.Client.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="TestResults\'\var\folders\c2\kqbrt1b11w3dycz8c03r43280000gn\T" />
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />

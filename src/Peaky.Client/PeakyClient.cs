@@ -4,24 +4,29 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Pocket;
 
 namespace Peaky.Client
 {
-    public class PeakyClient :IDisposable
+    public class PeakyClient : IDisposable
     {
         private readonly HttpClient _httpClient;
 
-        public PeakyClient(Uri serviceUri) :
-            this(new HttpClient
+        private readonly CompositeDisposable _disposables = new CompositeDisposable();
+
+        public PeakyClient(Uri serviceUri)
+        {
+            _httpClient = new HttpClient
             {
                 BaseAddress = serviceUri
-            })
-        {
+            };
+
+            _disposables.Add(_httpClient);
         }
 
         public PeakyClient(HttpClient httpClient)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
         public async Task<IEnumerable<Test>> GetTests()
@@ -44,7 +49,7 @@ namespace Peaky.Client
         {
             return await GetResultFor(test.Url);
         }
-        
+
         public async Task<TestResult> GetResultFor(Uri url)
         {
             var response = await _httpClient.GetAsync(url);
@@ -56,7 +61,7 @@ namespace Peaky.Client
 
         public void Dispose()
         {
-            _httpClient.Dispose();
+            _disposables.Dispose();
         }
     }
 }
