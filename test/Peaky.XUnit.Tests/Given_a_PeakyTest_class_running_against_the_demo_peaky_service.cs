@@ -1,15 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Xml.Serialization;
 using FluentAssertions;
-using Peaky.Client;
 using Peaky.XUnit.Tests.Model;
 using Xunit;
-using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace Peaky.XUnit.Tests
 {
