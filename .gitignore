@@ -4,12 +4,16 @@
 # Project-specific files
 .dotnet
 
-
 # User-specific files
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
+.vscode/
+*.ncrunchproject
+*.ncrunchsolution
+_NCrunch*
+nCrunch*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
