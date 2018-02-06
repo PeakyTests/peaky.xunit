@@ -19,7 +19,7 @@ We built Peaky.Xunit to simplify service validation inside our Visual Studio Onl
 These samples are written targetting the sample Peaky endpoint at http://peaky.azurewebsites.net/tests. Just plug in your own Peaky URI to get started!
 
 ### Run all Peaky Tests for a service
-```
+```csharp
 using System;
 using Xunit;
 using Peaky.XUnit;
@@ -54,7 +54,7 @@ namespace Peaky.Sample.Tests
 
 ### Run all Peaky Tests for a specific environment
 Note that the only change is the URL passed to PeakyClient. Cool!
-```
+```csharp
 using System;
 using Xunit;
 using Peaky.XUnit;
