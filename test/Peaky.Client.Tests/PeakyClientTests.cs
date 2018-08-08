@@ -89,7 +89,7 @@ namespace Peaky.Client.Tests
         public async void It_retrieves_results_for_a_passing_test()
         {
             using (var server = new FakeHttpService.FakeHttpService()
-                .WithTestResultAt("/a_passing_test", "abcdefg", true))
+                .WithTestResultAt("/a_passing_test", PeakyResponses.CreatePassedTestResultsFor("abcdefg", "testApp", "test", "a passing test", "http://server.path/a_passing_test", "a", "b") , true))
             {
                 var client = new PeakyClient( new Uri(server.BaseAddress, @"/tests"));
 
@@ -98,8 +98,10 @@ namespace Peaky.Client.Tests
                 var testResult = await client.GetResultFor(test);
 
                 testResult.Passed.Should().BeTrue();
-
-                testResult.Content.Should().Be("abcdefg");
+                testResult.Test.Application.Should().Be("testApp");
+                testResult.Test.Environment.Should().Be("test");
+                testResult.Test.Tags.Should().BeEquivalentTo("a", "b");
+                testResult.Content.Should().Contain("abcdefg");
             }
         }
 
@@ -107,7 +109,7 @@ namespace Peaky.Client.Tests
         public async void It_retrieves_results_for_a_failing_test()
         {
             using (var server = new FakeHttpService.FakeHttpService()
-                .WithTestResultAt("/a_failing_test", "hijklmnop", false))
+                .WithTestResultAt("/a_failing_test", PeakyResponses.CreateFailedTestResultsFor(new Exception("jijij"), "testApp", "test", "a failing test", "http://server.path/a_failing_test", "a", "b"), false))
             {
                 var client = new PeakyClient( new Uri(server.BaseAddress, @"/tests"));
 
@@ -116,8 +118,10 @@ namespace Peaky.Client.Tests
                 var testResult = await client.GetResultFor(test);
 
                 testResult.Passed.Should().BeFalse();
-
-                testResult.Content.Should().Be("hijklmnop");
+                testResult.Test.Application.Should().Be("testApp");
+                testResult.Test.Environment.Should().Be("test");
+                testResult.Test.Tags.Should().BeEquivalentTo("a", "b");
+                testResult.Content.Should().Contain("jijij");
             }
         }
 
@@ -125,7 +129,7 @@ namespace Peaky.Client.Tests
         public async void It_retrieves_results_for_a_passing_test_Url()
         {
             using (var server = new FakeHttpService.FakeHttpService()
-                .WithTestResultAt("/a_passing_test", "abcdefg", true))
+                .WithTestResultAt("/a_passing_test", PeakyResponses.CreatePassedTestResultsFor("abcdefg", "testApp", "test", "a passing test", "http://server.path/a_passing_test", "a", "b"), true))
             {
                 var client = new PeakyClient( new Uri(server.BaseAddress, @"/tests"));
 
@@ -134,8 +138,11 @@ namespace Peaky.Client.Tests
                 var testResult = await client.GetResultFor(test.Url);
 
                 testResult.Passed.Should().BeTrue();
-
-                testResult.Content.Should().Be("abcdefg");
+                testResult.Passed.Should().BeTrue();
+                testResult.Test.Application.Should().Be("testApp");
+                testResult.Test.Environment.Should().Be("test");
+                testResult.Test.Tags.Should().BeEquivalentTo("a", "b");
+                testResult.Content.Should().Contain("abcdefg");
             }
         }
 
@@ -143,7 +150,7 @@ namespace Peaky.Client.Tests
         public async void It_retrieves_results_for_a_failing_test_Url()
         {
             using (var server = new FakeHttpService.FakeHttpService()
-                .WithTestResultAt("/a_failing_test", "hijklmnop", false))
+                .WithTestResultAt("/a_failing_test", PeakyResponses.CreateFailedTestResultsFor(new Exception("hijklmnop"), "testApp", "test", "a failing test", "http://server.path/a_failing_test", "a", "b") , false))
             {
                 var client = new PeakyClient( new Uri(server.BaseAddress, @"/tests"));
 
@@ -153,7 +160,7 @@ namespace Peaky.Client.Tests
 
                 testResult.Passed.Should().BeFalse();
 
-                testResult.Content.Should().Be("hijklmnop");
+                testResult.Content.Should().Contain("hijklmnop");
             }
         }
 

@@ -1,4 +1,8 @@
-﻿namespace Peaky.Client.Tests
+﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+namespace Peaky.Client.Tests
 {
     public class PeakyResponses
     {
@@ -137,9 +141,42 @@
             ]
         }";
 
-        public static string TestResult { get; } = @"{
-        ""Message"": ""Expected a value less than 5, but found 381."",
-        ""Exception"": ""{ AssertionFailedException: Message = Expected a value less than 5, but found 381. | Data = {  } | InnerException = [null] | TargetSite = Void Throw(System.String) | StackTrace =    at FluentAssertions.Execution.FallbackTestFramework.Throw(String message)\r\n   at FluentAssertions.Execution.TestFrameworkProvider.Throw(String message)\r\n   at FluentAssertions.Execution.DefaultAssertionStrategy.HandleFailure(String message)\r\n   at FluentAssertions.Execution.AssertionScope.FailWith(String message, Object[] args)\r\n   at FluentAssertions.Numeric.NumericAssertions`1.BeLessThan(T expected, String because, Object[] becauseArgs)\r\n   at Peaky.SampleWebApplication.BingTests.bing_homepage_returned_in_under_5ms()\r\n   at lambda_method(Closure , BingTests )\r\n   at Peaky.TestDefinition`1.Run(HttpActionContext context, Func`2 resolver)\r\n   at Peaky.PeakyTestController.<Run>d__1.MoveNext()\r\n--- End of stack trace from previous location where exception was thrown ---\r\n   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n   at System.Threading.Tasks.TaskHelpersExtensions.<CastToObject>d__3`1.MoveNext()\r\n--- End of stack trace from previous location where exception was thrown ---\r\n   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n   at System.Web.Http.Controllers.ApiControllerActionInvoker.<InvokeActionAsyncCore>d__0.MoveNext()\r\n--- End of stack trace from previous location where exception was thrown ---\r\n   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n   at System.Web.Http.Filters.ActionFilterAttribute.<CallOnActionExecutedAsync>d__5.MoveNext()\r\n--- End of stack trace from previous location where exception was thrown ---\r\n   at System.Web.Http.Filters.ActionFilterAttribute.<CallOnActionExecutedAsync>d__5.MoveNext()\r\n--- End of stack trace from previous location where exception was thrown ---\r\n   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n   at System.Web.Http.Filters.ActionFilterAttribute.<ExecuteActionFilterAsyncCore>d__0.MoveNext()\r\n--- End of stack trace from previous location where exception was thrown ---\r\n   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n   at System.Web.Http.Controllers.ActionFilterResult.<ExecuteAsync>d__2.MoveNext()\r\n--- End of stack trace from previous location where exception was thrown ---\r\n   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n   at System.Web.Http.Controllers.ExceptionFilterResult.<ExecuteAsync>d__0.MoveNext() | HelpLink = [null] | Source = FluentAssertions | HResult = -2146233088 }""
-}";
+
+        public static string CreateFailedTestResultsFor(Exception error, string applciation, string environment, string testName, string testUrl, params string[] tags)
+        {
+            var obj = new JObject
+            {
+                ["Message"] = error.Message,
+                ["Passed"] = false,
+                ["Exception"] = JToken.FromObject(error),
+                ["Test"] = new JObject
+                {
+                    ["Application"] = applciation,
+                    ["Environment"] = environment,
+                    ["Name"] = testName,
+                    ["Url"] = new Uri(testUrl),
+                    ["Tags"] = JToken.FromObject(tags ?? Array.Empty<string>())
+                }
+            };
+            return obj.ToString();
+        }
+
+        public static string CreatePassedTestResultsFor(object result, string applciation, string environment, string testName, string testUrl, params string[] tags)
+        {
+            var obj = new JObject
+            {
+                ["ReturnValue"] = JToken.FromObject(result),
+                ["Passed"] = true,
+                ["Test"] = new JObject
+                {
+                    ["Application"] = applciation,
+                    ["Environment"] = environment,
+                    ["Name"] = testName,
+                    ["Url"] = new Uri(testUrl),
+                    ["Tags"] = JToken.FromObject(tags ?? Array.Empty<string>())
+                }
+            };
+            return obj.ToString();
+        }
     }
 }
