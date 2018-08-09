@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/kf2mh9ecqlpyxmme?svg=true)](https://ci.appveyor.com/project/piotrpMSFT/peaky-xunit)
+[![Build status](https://ci.appveyor.com/api/projects/status/kf2mh9ecqlpyxmme?svg=true)](https://ci.appveyor.com/project/PeakyTests/peaky-xunit)
 [![NuGet Badge](https://buildstats.info/nuget/peaky.xunit?includePreReleases=true)](https://www.nuget.org/packages/peaky.xunit)
 
 
