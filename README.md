@@ -3,7 +3,7 @@
 
 
 # peaky.xunit
-Run your [Peaky](https://github.com/PhillipPruett/Peaky) tests to validate new deployments using this simple library. 
+Run your [Peaky](https://github.com/PeakyTests/Peaky) tests to validate new deployments using this simple library. 
 Peaky.XUnit makes it easy for xunit to invoke tests from a Peaky endpoint, immediately integrating Peaky test results into your existing test execution infrastructure.
 We built Peaky.Xunit to simplify service validation inside our Visual Studio Online Release Management pipeline, and the same library can be used anywhere else you want to validate your Peaky tests.
 

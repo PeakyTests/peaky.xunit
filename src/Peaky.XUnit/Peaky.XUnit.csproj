@@ -4,13 +4,13 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Authors>PiotrP,PiotrPMSFT,Microsoft</Authors>
+    <Authors>PiotrP,TheRealPiotrP,Microsoft</Authors>
     <Product>Peaky.XUnit</Product>
     <Description>XUnit integration for Peaky. Use Peaky.Xunit to generate data-driven XUnit tests based on our Peaky end-point. These tests can be executed to perform release-time build validation and to provide meaningful reporting with existing xunit-based tools.</Description>
     <Copyright>Copyright © Piotr Puszkiewicz. All Rights Reserved.</Copyright>
-    <PackageLicenseUrl>https://github.com/piotrpMSFT/peaky.xunit/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/piotrpMSFT/peaky.xunit/</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/piotrpMSFT/peaky.xunit.git</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/PeakyTests/peaky.xunit/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/PeakyTests/peaky.xunit/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/PeakyTests/peaky.xunit.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
   
