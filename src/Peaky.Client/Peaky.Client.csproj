@@ -17,8 +17,9 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>10.0.2</Version>
     </PackageReference>
-    <PackageReference Include="pocket.disposable" Version="1.0.2">
+    <PackageReference Include="pocket.disposable" Version="1.0.4">
       <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>contentfiles</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 </Project>

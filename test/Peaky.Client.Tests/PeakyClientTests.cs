@@ -1,8 +1,9 @@
 using System;
 using System.Linq;
-using System.Net.Http;
+using System.Threading.Tasks;
 using FakeHttpService;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Xunit;
 
 namespace Peaky.Client.Tests
@@ -22,30 +23,11 @@ namespace Peaky.Client.Tests
                 tests.Should().HaveCount(15);
             }
         }
-        
-        [Fact]
-        public async void It_can_load_tests_from_a_Peaky_service_by_HttpClient()
-        {
-            using (var server = new FakeHttpService.FakeHttpService()
-                .WithContentAt("/tests", PeakyResponses.Tests))
-            {
-                var httpClient = new HttpClient
-                {
-                    BaseAddress = new Uri(server.BaseAddress, @"/tests")
-                };
-                
-                var client = new PeakyClient(httpClient);
-
-                var tests = await client.GetTests();
-
-                tests.Should().HaveCount(15);
-            }
-        }
-
+   
         [Fact]
         public async void It_can_load_tests_from_a_Peaky_service_with_specific_environment()
         {
-            Uri requestUri = (Uri)null;
+            Uri requestUri = null;
             string requestPath= string.Empty;
 
             using (var server = new FakeHttpService.FakeHttpService().OnRequest(r => true).RespondWith(async (response, uri) =>
@@ -56,7 +38,7 @@ namespace Peaky.Client.Tests
             {
                 var client = new PeakyClient(new Uri(server.BaseAddress, @"/tests/test"));
 
-                var tests = await client.GetTests();
+                await client.GetTests();
 
                 requestPath.Should().Be(@"/tests/test");
             }
@@ -177,5 +159,41 @@ namespace Peaky.Client.Tests
                 tests.Should().BeEmpty();
             }
         }
+
+        [Fact]
+        public async Task It_returns_the_Peaky_session_cookie_on_subsequent_requests()
+        {
+            var requestCount = 0;
+            var sessionId = Guid.NewGuid().ToString();
+            var receivedSessionIdOnSecondRequest = false;
+
+            using (var server = new FakeHttpService.FakeHttpService()
+                                .OnRequest(_ => true)
+                                .RespondWith(async response =>
+                                {   await response.WriteAsync("{}");
+                                    if (requestCount == 0)
+                                    {
+                                        requestCount++;
+                                        response.Cookies.Append("peaky-session", sessionId);
+                                     
+                                    }
+                                    else
+                                    {
+                                        if (response.HttpContext.Request.Cookies.TryGetValue("peaky-session", out var value))
+                                        {
+                                            receivedSessionIdOnSecondRequest = value == sessionId;
+                                        }
+                                    }
+                                }))
+            {
+                var client = new PeakyClient(server.BaseAddress);
+
+                await client.GetResultFor(new Uri(server.BaseAddress, "/tests/a_test"));
+                await client.GetResultFor(new Uri(server.BaseAddress, "/tests/a_test"));
+            }
+
+            receivedSessionIdOnSecondRequest.Should().BeTrue();
+        }
     }
 }
+
