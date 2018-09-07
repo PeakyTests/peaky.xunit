@@ -16,17 +16,18 @@ namespace Peaky.Client
 
         public PeakyClient(Uri serviceUri)
         {
-            _httpClient = new HttpClient
+            var handler = new HttpClientHandler
+            {
+                CookieContainer = new CookieContainer()
+            };
+
+            _httpClient = new HttpClient(handler)
             {
                 BaseAddress = serviceUri
             };
 
             _disposables.Add(_httpClient);
-        }
-
-        public PeakyClient(HttpClient httpClient)
-        {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _disposables.Add(handler);
         }
 
         public async Task<IEnumerable<Test>> GetTests()
