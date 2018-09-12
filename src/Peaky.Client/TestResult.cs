@@ -14,7 +14,7 @@ namespace Peaky.Client
             var parsed = JObject.Parse(content);
             
             Test = (parsed["Test"] ?? parsed["test"])?.ToObject<TestInfo>();
-            
+
         }
 
         public string Content { get; }

@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Pocket;
 
 namespace Peaky.Client
@@ -51,16 +52,31 @@ namespace Peaky.Client
             return await GetResultFor(test.Url);
         }
 
-        public async Task<TestResult> GetResultFor(Uri url)
+        public async Task<TestResult> GetResultFor(Uri url, TimeSpan? maxIntervalForRetrial = null)
         {
             var currentAttempt = 1;
+             const int maxAttempts = 10;
             var random = new Random();
             var response = await _httpClient.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
-            while (response.StatusCode == HttpStatusCode.ServiceUnavailable && currentAttempt < 10)
+
+            while (response.StatusCode == HttpStatusCode.ServiceUnavailable && currentAttempt < maxAttempts)
             {
-                var waitInterval = random.Next(1, 10);
-                await Task.Delay(TimeSpan.FromMinutes(waitInterval));
+                var parsed = JObject.Parse(content);
+                var supportsRetry = (parsed["SupportsRetry"] ?? parsed["supportsRetry"])?.Value<bool>() == true;
+
+                if (!supportsRetry)
+                {
+                    return new TestResult(content, response.StatusCode == HttpStatusCode.OK);
+                }
+
+                var maxMinutes = (int) (maxIntervalForRetrial?? TimeSpan.FromMinutes(10)).TotalMinutes;
+                if (maxMinutes > 0)
+                {
+                    var waitInterval = random.Next(1, maxMinutes);
+                    await Task.Delay(TimeSpan.FromMinutes(waitInterval));
+                }
+
                 currentAttempt++;
                 response = await _httpClient.GetAsync(url);
                 content = await response.Content.ReadAsStringAsync();

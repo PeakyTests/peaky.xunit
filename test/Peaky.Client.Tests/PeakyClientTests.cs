@@ -106,7 +106,7 @@ namespace Peaky.Client.Tests
                 testResult.Content.Should().Contain("jijij");
             }
         }
-
+     
         [Fact]
         public async void It_retrieves_results_for_a_passing_test_Url()
         {
@@ -140,6 +140,27 @@ namespace Peaky.Client.Tests
 
                 var testResult = await client.GetResultFor(test.Url);
 
+                testResult.Passed.Should().BeFalse();
+
+                testResult.Content.Should().Contain("hijklmnop");
+            }
+        }
+
+        [Fact]
+        public async void It_retrieves_results_for_a_failing_test_Url_and_performs_another_attempt()
+        {
+            var attempted = false;
+            using (var server = new FakeHttpService.FakeHttpService()
+                .WithRetriableTestResultAt(
+                    "/a_failing_test", PeakyResponses.CreateFailedRetriableTestResultsFor(new Exception("hijklmnop"), "testApp", "test", "a failing test", "http://server.path/a_failing_test", "a", "b"), false, () => attempted = true))
+            {
+                var client = new PeakyClient(new Uri(server.BaseAddress, @"/tests"));
+
+                var test = new Test("", "", new Uri(server.BaseAddress, "/a_failing_test"), null);
+
+                var testResult = await client.GetResultFor(test.Url, TimeSpan.Zero);
+
+                attempted.Should().BeTrue();
                 testResult.Passed.Should().BeFalse();
 
                 testResult.Content.Should().Contain("hijklmnop");
