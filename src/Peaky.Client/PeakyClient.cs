@@ -53,9 +53,18 @@ namespace Peaky.Client
 
         public async Task<TestResult> GetResultFor(Uri url)
         {
+            var currentAttempt = 1;
+            var random = new Random();
             var response = await _httpClient.GetAsync(url);
-
             var content = await response.Content.ReadAsStringAsync();
+            while (response.StatusCode == HttpStatusCode.ServiceUnavailable && currentAttempt < 10)
+            {
+                var waitInterval = random.Next(1, 10);
+                await Task.Delay(TimeSpan.FromMinutes(waitInterval));
+                currentAttempt++;
+                response = await _httpClient.GetAsync(url);
+                content = await response.Content.ReadAsStringAsync();
+            }
 
             return new TestResult(content, response.StatusCode == HttpStatusCode.OK);
         }
