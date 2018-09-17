@@ -59,7 +59,7 @@ namespace Peaky.Client
             var random = new Random();
             var response = await _httpClient.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
-
+            var testOutcome = ParseTestOutCome(response.StatusCode, content);
             while (response.StatusCode == HttpStatusCode.ServiceUnavailable && currentAttempt < maxAttempts)
             {
                 var parsed = JObject.Parse(content);
@@ -67,7 +67,7 @@ namespace Peaky.Client
 
                 if (!supportsRetry)
                 {
-                    return new TestResult(content, response.StatusCode == HttpStatusCode.OK);
+                    return new TestResult(content, testOutcome);
                 }
 
                 var maxMinutes = (int) (maxIntervalForRetrial?? TimeSpan.FromMinutes(10)).TotalMinutes;
@@ -82,7 +82,27 @@ namespace Peaky.Client
                 content = await response.Content.ReadAsStringAsync();
             }
 
-            return new TestResult(content, response.StatusCode == HttpStatusCode.OK);
+            return new TestResult(content, testOutcome);
+        }
+
+        private TestOutcome ParseTestOutCome(HttpStatusCode responseStatusCode, string content)
+        {
+            TestOutcome outcome;
+            try
+            {
+                var parsed = JObject.Parse(content);
+
+                var outComeString = (parsed["Test"] ?? parsed["test"])?.Value<string>();
+                if (!Enum.TryParse(outComeString, true, out outcome))
+                {
+                    outcome = responseStatusCode == HttpStatusCode.OK ? TestOutcome.Passed : TestOutcome.Failed;
+                }
+            }
+            catch
+            {
+                outcome = responseStatusCode == HttpStatusCode.OK ? TestOutcome.Passed : TestOutcome.Failed;
+            }
+            return outcome;
         }
 
         public void Dispose()

@@ -2,20 +2,33 @@
 
 namespace Peaky.Client
 {
+    public enum TestOutcome
+    {
+        Passed,
+        Failed,
+        Inconclusive,
+        Error,
+        Timeout
+
+    }
+
     public class TestResult
     {
+
+        public TestOutcome Outcome { get;  }
+
         public TestInfo Test { get; }
      
-        public TestResult(string content, bool passed)
+        public TestResult(string content, TestOutcome outcome)
         {
             Content = content;
-            Passed = passed;
+            Outcome = outcome;
             var parsed = JObject.Parse(content);
             Test = (parsed["Test"] ?? parsed["test"])?.ToObject<TestInfo>();
         }
 
         public string Content { get; }
 
-        public bool Passed { get; }
+        public bool Passed => Outcome == TestOutcome.Passed;
     }
 }
