@@ -141,7 +141,7 @@ namespace Peaky.Client.Tests
         }";
 
 
-        public static string CreateFailedTestResultsFor(Exception error, string applciation, string environment, string testName, string testUrl, params string[] tags)
+        public static string CreateFailedTestResultsFor(Exception error, string application, string environment, string testName, string testUrl, params string[] tags)
         {
             var obj = new JObject
             {
@@ -150,7 +150,7 @@ namespace Peaky.Client.Tests
                 ["Exception"] = JToken.FromObject(error),
                 ["Test"] = new JObject
                 {
-                    ["Application"] = applciation,
+                    ["Application"] = application,
                     ["Environment"] = environment,
                     ["Name"] = testName,
                     ["Url"] = new Uri(testUrl),
@@ -160,7 +160,27 @@ namespace Peaky.Client.Tests
             return obj.ToString();
         }
 
-        public static string CreatePassedTestResultsFor(object result, string applciation, string environment, string testName, string testUrl, params string[] tags)
+        public static string CreateFailedRetriableTestResultsFor(Exception error, string application, string environment, string testName, string testUrl, params string[] tags)
+        {
+            var obj = new JObject
+            {
+                ["Message"] = error.Message,
+                ["Passed"] = false,
+                ["SupportsRetry"] = true,
+                ["Exception"] = JToken.FromObject(error),
+                ["Test"] = new JObject
+                {
+                    ["Application"] = application,
+                    ["Environment"] = environment,
+                    ["Name"] = testName,
+                    ["Url"] = new Uri(testUrl),
+                    ["Tags"] = JToken.FromObject(tags ?? Array.Empty<string>())
+                }
+            };
+            return obj.ToString();
+        }
+
+        public static string CreatePassedTestResultsFor(object result, string application, string environment, string testName, string testUrl, params string[] tags)
         {
             var obj = new JObject
             {
@@ -168,7 +188,7 @@ namespace Peaky.Client.Tests
                 ["Passed"] = true,
                 ["Test"] = new JObject
                 {
-                    ["Application"] = applciation,
+                    ["Application"] = application,
                     ["Environment"] = environment,
                     ["Name"] = testName,
                     ["Url"] = new Uri(testUrl),
