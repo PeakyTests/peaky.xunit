@@ -31,6 +31,11 @@ namespace Peaky.Client
             _disposables.Add(handler);
         }
 
+        public PeakyClient(HttpClient httpClient)
+        {
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        }
+
         public async Task<IEnumerable<Test>> GetTests()
         {
             var response = await _httpClient.GetAsync("");
