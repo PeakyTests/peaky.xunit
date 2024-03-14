@@ -1,27 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Peaky.Client
+namespace Peaky.Client;
+
+public class Test
 {
-    public class Test
+    public Test(string application, string environment, Uri url, IEnumerable<string> tags)
     {
-        public Test(string application, string environment, Uri url, IEnumerable<string> tags)
-        {
-            Application = application;
+        Application = application;
 
-            Environment = environment;
+        Environment = environment;
 
-            Url = url;
+        Url = url;
 
-            Tags = tags;
-        }
-
-        public string Application { get; }
-
-        public string Environment { get; }
-
-        public Uri Url { get; }
-
-        public IEnumerable<string> Tags { get; }
+        Tags = tags;
     }
+
+    public string Application { get; }
+
+    public string Environment { get; }
+
+    public Uri Url { get; }
+
+    public IEnumerable<string> Tags { get; }
 }
