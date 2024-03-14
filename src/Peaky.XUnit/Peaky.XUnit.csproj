@@ -13,11 +13,9 @@
     <PackageProjectUrl>https://github.com/PeakyTests/peaky.xunit/</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>Peaky testing tool PeakyTests</PackageTags>
-    <PackAsTool>true</PackAsTool>
     <Product>Peaky.XUnit</Product>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/PeakyTests/peaky.xunit.git</RepositoryUrl>
-    <ToolCommandName>peaky-xunit</ToolCommandName>
   </PropertyGroup>
 
   <ItemGroup>
