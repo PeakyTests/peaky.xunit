@@ -4,20 +4,33 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Authors>PiotrP,TheRealPiotrP,Microsoft</Authors>
-    <Product>Peaky.XUnit</Product>
-    <Description>XUnit integration for Peaky. Use Peaky.Xunit to generate data-driven XUnit tests based on our Peaky end-point. These tests can be executed to perform release-time build validation and to provide meaningful reporting with existing xunit-based tools.</Description>
+    <Authors>PiotrP,TheRealPiotrP,Microsoft,jonsequitur</Authors>
     <Copyright>Copyright © Piotr Puszkiewicz. All Rights Reserved.</Copyright>
-    <PackageLicenseUrl>https://github.com/PeakyTests/peaky.xunit/blob/master/LICENSE</PackageLicenseUrl>
+    <Description>XUnit integration for Peaky. Use Peaky.Xunit to generate data-driven XUnit tests based on a Peaky endpoint. These tests can be executed to perform release-time deployment       validation and monitoring and to provide meaningful reporting with existing Xunit-based tools.</Description>
+    <IsPackable>true</IsPackable>
+    <PackageId>peaky-xunit</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/PeakyTests/peaky.xunit/</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/PeakyTests/peaky.xunit.git</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>Peaky testing tool PeakyTests</PackageTags>
+    <PackAsTool>true</PackAsTool>
+    <Product>Peaky.XUnit</Product>
     <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/PeakyTests/peaky.xunit.git</RepositoryUrl>
+    <ToolCommandName>peaky-xunit</ToolCommandName>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\Peaky.Client\Peaky.Client.csproj" />
   </ItemGroup>
+
+  
   <ItemGroup>
     <PackageReference Include="xunit" Version="2.7.0" />
   </ItemGroup>
+  
+  <ItemGroup>
+      <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
 </Project>

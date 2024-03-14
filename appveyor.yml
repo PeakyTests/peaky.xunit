@@ -12,11 +12,13 @@ before_build:
 build_script:
   - cmd: >-
       dotnet build peaky.xunit.sln /p:Version=%APPVEYOR_BUILD_VERSION%
+
 after_build:
   - cmd: >-
       dotnet pack .\src\Peaky.Client\Peaky.Client.csproj --no-build /p:Version=%APPVEYOR_BUILD_VERSION%
   - cmd: >-
       dotnet pack .\src\Peaky.XUnit\Peaky.XUnit.csproj --no-build /p:Version=%APPVEYOR_BUILD_VERSION%
+
 test_script:
   - cmd: dotnet test .\test\Peaky.Client.Tests\Peaky.Client.Tests.csproj
   - cmd: dotnet test .\test\Peaky.XUnit.Tests\Peaky.XUnit.Tests.csproj
