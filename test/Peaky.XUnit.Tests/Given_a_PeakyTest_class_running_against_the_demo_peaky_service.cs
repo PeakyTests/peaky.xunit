@@ -6,119 +6,116 @@ using FluentAssertions;
 using Peaky.XUnit.Tests.Model;
 using Xunit;
 
-namespace Peaky.XUnit.Tests
+namespace Peaky.XUnit.Tests;
+
+public class Given_a_PeakyTest_class_running_against_the_demo_peaky_service
 {
-    public class Given_a_PeakyTest_class_running_against_the_demo_peaky_service
+    private static  TestRun _testRun;
+
+    [Fact]
+    public void It_identifies_15_tests()
     {
-        private static  TestRun _testRun;
+        _testRun.Results.Should().HaveCount(15);
+    }
 
-        [Fact]
-        public void It_identifies_15_tests()
-        {
-            _testRun.Results.Should().HaveCount(15);
-        }
+    [Fact]
+    public void It_identifies_11_passing_tests()
+    {
+        _testRun
+            .Results
+            .Where(r => r.Outcome == "Passed")
+            .Should().HaveCount(11);
+    }
 
-        [Fact]
-        public void It_identifies_11_passing_tests()
-        {
-            _testRun
-                .Results
-                .Where(r => r.Outcome == "Passed")
-                .Should().HaveCount(11);
-        }
+    [Fact]
+    public void It_identifies_4_failing_tests()
+    {
+        _testRun
+            .Results
+            .Where(r => r.Outcome == "Failed")
+            .Should().HaveCount(4);
+    }
 
-        [Fact]
-        public void It_identifies_4_failing_tests()
-        {
-            _testRun
-                .Results
-                .Where(r => r.Outcome == "Failed")
-                .Should().HaveCount(4);
-        }
+    [Fact]
+    public void It_produces_tests_with_the_test_Uri_in_the_test_name()
+    {
+        var preString = "Peaky.Sample.Tests.PeakySampleTests.The_peaky_test_passes(url: ";
+        var postString = ")";
 
-        [Fact]
-        public void It_produces_tests_with_the_test_Uri_in_the_test_name()
-        {
-            var preString = "Peaky.Sample.Tests.PeakySampleTests.The_peaky_test_passes(url: ";
-            var postString = ")";
+        _testRun
+            .Results
+            .Select(r => r.TestName.Substring(preString.Length))
+            .Select(n => n.Substring(0, n.Length - postString.Length))
+            .Select(n => new Uri(n))
+            .Where(u => u.IsAbsoluteUri)
+            .Should().HaveCount(15);
+    }
 
-            _testRun
-                .Results
-                .Select(r => r.TestName.Substring(preString.Length))
-                .Select(n => n.Substring(0, n.Length - postString.Length))
-                .Select(n => new Uri(n))
-                .Where(u => u.IsAbsoluteUri)
-                .Should().HaveCount(15);
-        }
-
-        static Given_a_PeakyTest_class_running_against_the_demo_peaky_service() 
+    static Given_a_PeakyTest_class_running_against_the_demo_peaky_service() 
+    { 
+        if (_testRun != null) 
         { 
-            if (_testRun != null) 
-            { 
-                return; 
-            } 
- 
-            GenerateTestRun(); 
+            return; 
         } 
+ 
+        GenerateTestRun(); 
+    } 
         
-        private static void GenerateTestRun()
+    private static void GenerateTestRun()
+    {
+        var trxFileInfo = new FileInfo("Given_a_PeakyTest_class_running_against_the_demo_peaky_service.trx");
+
+        var sampleTestProjectDirectory = GetSampleTestProjectDirectory();
+
+        try
         {
-            var trxFileInfo = new FileInfo("Given_a_PeakyTest_class_running_against_the_demo_peaky_service.trx");
+            DotnetTest.TryRunTests(sampleTestProjectDirectory, trxFileInfo);
 
-            var sampleTestProjectDirectory = GetSampleTestProjectDirectory();
+            _testRun = DeserializeTrxFile(trxFileInfo);
+        }
+        finally
+        {
+            trxFileInfo.Refresh();
 
-            try
+            if (trxFileInfo.Exists)
             {
-                DotnetTest.TryRunTests(sampleTestProjectDirectory, trxFileInfo);
-
-                _testRun = DeserializeTrxFile(trxFileInfo);
-            }
-            finally
-            {
-                trxFileInfo.Refresh();
-
-                if (trxFileInfo.Exists)
-                {
-                    trxFileInfo.Delete();
-                }
+                trxFileInfo.Delete();
             }
         }
+    }
 
-        private static TestRun DeserializeTrxFile(FileInfo trxFileInfo)
-        {
-            var serializer = new XmlSerializer(
-                typeof(TestRun),
-                new XmlRootAttribute("TestRun")
-                {
-                    Namespace = "http://microsoft.com/schemas/VisualStudio/TeamTest/2010"
-                });
-
-            TestRun testRun;
-            
-            using (var trxFile = File.Open(
-                trxFileInfo.FullName,
-                FileMode.Open))
+    private static TestRun DeserializeTrxFile(FileInfo trxFileInfo)
+    {
+        var serializer = new XmlSerializer(
+            typeof(TestRun),
+            new XmlRootAttribute("TestRun")
             {
-                testRun = (TestRun) serializer.Deserialize(trxFile);
-            }
+                Namespace = "http://microsoft.com/schemas/VisualStudio/TeamTest/2010"
+            });
 
-            return testRun;
-        }
+        TestRun testRun;
 
-        private static DirectoryInfo GetSampleTestProjectDirectory()
+        using var trxFile = File.Open(
+            trxFileInfo.FullName,
+            FileMode.Open);
+        testRun = (TestRun) serializer.Deserialize(trxFile);
+
+        return testRun;
+    }
+
+    private static DirectoryInfo GetSampleTestProjectDirectory()
+    {
+        var sampleTestProjectDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
+            
+        while (sampleTestProjectDirectory.GetFiles("*.sln").Length != 1)
         {
-            var sampleTestProjectDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
-            
-            while (sampleTestProjectDirectory.GetFiles("*.sln").Length != 1)
-            {
-                sampleTestProjectDirectory = sampleTestProjectDirectory.Parent;
-            }
-            
-            sampleTestProjectDirectory =
-                new DirectoryInfo(Path
-                    .Combine(sampleTestProjectDirectory.FullName, "test", "Peaky.Sample.tests"));
-            
-            return sampleTestProjectDirectory;
+            sampleTestProjectDirectory = sampleTestProjectDirectory.Parent;
         }
+            
+        sampleTestProjectDirectory =
+            new DirectoryInfo(Path
+                                  .Combine(sampleTestProjectDirectory.FullName, "test", "Peaky.Sample.tests"));
+            
+        return sampleTestProjectDirectory;
     }
 }

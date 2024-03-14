@@ -1,11 +1,11 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
 
-namespace Peaky.Client.Tests
+namespace Peaky.Client.Tests;
+
+public class PeakyResponses
 {
-    public class PeakyResponses
-    {
-        public static string Tests { get; } = @"{
+    public static string Tests { get; } = @"{
   ""Tests"": [
             {
                 ""Application"": ""bing"",
@@ -141,61 +141,60 @@ namespace Peaky.Client.Tests
         }";
 
 
-        public static string CreateFailedTestResultsFor(Exception error, string application, string environment, string testName, string testUrl, params string[] tags)
+    public static string CreateFailedTestResultsFor(Exception error, string application, string environment, string testName, string testUrl, params string[] tags)
+    {
+        var obj = new JObject
         {
-            var obj = new JObject
+            ["Message"] = error.Message,
+            ["Passed"] = false,
+            ["Exception"] = JToken.FromObject(error),
+            ["Test"] = new JObject
             {
-                ["Message"] = error.Message,
-                ["Passed"] = false,
-                ["Exception"] = JToken.FromObject(error),
-                ["Test"] = new JObject
-                {
-                    ["Application"] = application,
-                    ["Environment"] = environment,
-                    ["Name"] = testName,
-                    ["Url"] = new Uri(testUrl),
-                    ["Tags"] = JToken.FromObject(tags ?? Array.Empty<string>())
-                }
-            };
-            return obj.ToString();
-        }
+                ["Application"] = application,
+                ["Environment"] = environment,
+                ["Name"] = testName,
+                ["Url"] = new Uri(testUrl),
+                ["Tags"] = JToken.FromObject(tags ?? Array.Empty<string>())
+            }
+        };
+        return obj.ToString();
+    }
 
-        public static string CreateFailedRetriableTestResultsFor(Exception error, string application, string environment, string testName, string testUrl, params string[] tags)
+    public static string CreateFailedRetriableTestResultsFor(Exception error, string application, string environment, string testName, string testUrl, params string[] tags)
+    {
+        var obj = new JObject
         {
-            var obj = new JObject
+            ["Message"] = error.Message,
+            ["Passed"] = false,
+            ["SupportsRetry"] = true,
+            ["Exception"] = JToken.FromObject(error),
+            ["Test"] = new JObject
             {
-                ["Message"] = error.Message,
-                ["Passed"] = false,
-                ["SupportsRetry"] = true,
-                ["Exception"] = JToken.FromObject(error),
-                ["Test"] = new JObject
-                {
-                    ["Application"] = application,
-                    ["Environment"] = environment,
-                    ["Name"] = testName,
-                    ["Url"] = new Uri(testUrl),
-                    ["Tags"] = JToken.FromObject(tags ?? Array.Empty<string>())
-                }
-            };
-            return obj.ToString();
-        }
+                ["Application"] = application,
+                ["Environment"] = environment,
+                ["Name"] = testName,
+                ["Url"] = new Uri(testUrl),
+                ["Tags"] = JToken.FromObject(tags ?? Array.Empty<string>())
+            }
+        };
+        return obj.ToString();
+    }
 
-        public static string CreatePassedTestResultsFor(object result, string application, string environment, string testName, string testUrl, params string[] tags)
+    public static string CreatePassedTestResultsFor(object result, string application, string environment, string testName, string testUrl, params string[] tags)
+    {
+        var obj = new JObject
         {
-            var obj = new JObject
+            ["ReturnValue"] = JToken.FromObject(result),
+            ["Passed"] = true,
+            ["Test"] = new JObject
             {
-                ["ReturnValue"] = JToken.FromObject(result),
-                ["Passed"] = true,
-                ["Test"] = new JObject
-                {
-                    ["Application"] = application,
-                    ["Environment"] = environment,
-                    ["Name"] = testName,
-                    ["Url"] = new Uri(testUrl),
-                    ["Tags"] = JToken.FromObject(tags ?? Array.Empty<string>())
-                }
-            };
-            return obj.ToString();
-        }
+                ["Application"] = application,
+                ["Environment"] = environment,
+                ["Name"] = testName,
+                ["Url"] = new Uri(testUrl),
+                ["Tags"] = JToken.FromObject(tags ?? Array.Empty<string>())
+            }
+        };
+        return obj.ToString();
     }
 }

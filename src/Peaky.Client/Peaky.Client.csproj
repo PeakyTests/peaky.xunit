@@ -1,7 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Authors>PiotrP,TheRealPiotrP,Microsoft</Authors>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>PiotrP,TheRealPiotrP,Microsoft,jonsequitur</Authors>
     <Product>Peaky.Client</Product>
     <Description>.NET Peaky Client. Provides .NET apps read access to Peaky services.</Description>
     <Copyright>Copyright © Piotr Puszkiewicz. All Rights Reserved.</Copyright>
@@ -10,16 +14,15 @@
     <RepositoryUrl>https://github.com/PeakyTests/peaky.xunit.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>11.0.2</Version>
+      <Version>13.0.3</Version>
     </PackageReference>
-    <PackageReference Include="pocket.disposable" Version="1.0.4">
+    <PackageReference Include="pocket.disposable" Version="1.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>contentfiles</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+  
 </Project>
