@@ -12,7 +12,7 @@ public abstract class PeakyXunitTestBase : IEnumerable<object[]>
     public IEnumerator<object[]> GetEnumerator()
     {
         return PeakyClient
-               .GetTests()
+               .GetTestsAsync()
                .Result
                .Select(t => new object [] {t.Url})
                .GetEnumerator();

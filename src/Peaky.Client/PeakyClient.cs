@@ -36,7 +36,7 @@ public class PeakyClient : IDisposable
         _httpClient = httpClient;
     }
 
-    public async Task<IEnumerable<Test>> GetTests()
+    public async Task<IEnumerable<Test>> GetTestsAsync()
     {
         var response = await _httpClient.GetAsync("");
 
@@ -52,12 +52,12 @@ public class PeakyClient : IDisposable
         return testResponse.Tests;
     }
 
-    public async Task<TestResult> GetResultFor(Test test)
+    public async Task<TestResult> GetTestResultAsync(Test test)
     {
-        return await GetResultFor(test.Url);
+        return await GetTestResultAsync(test.Url);
     }
 
-    public async Task<TestResult> GetResultFor(Uri url, TimeSpan? maxIntervalForRetrial = null)
+    public async Task<TestResult> GetTestResultAsync(Uri url, TimeSpan? maxIntervalForRetrial = null)
     {
         var currentAttempt = 1;
         const int maxAttempts = 10;

@@ -4,11 +4,10 @@ namespace Peaky.Client;
 
 public class TestResult
 {
-
-    public TestOutcome Outcome { get;  }
+    public TestOutcome Outcome { get; }
 
     public TestInfo Test { get; }
-     
+
     public TestResult(string content, TestOutcome outcome)
     {
         Content = content;

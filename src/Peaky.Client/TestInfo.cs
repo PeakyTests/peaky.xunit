@@ -16,13 +16,13 @@ public class TestInfo
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public string[] Tags { get; }
 
-    public TestInfo(string application,
+    public TestInfo(
+        string application,
         string environment,
         string name,
         Uri url,
         string[] tags = null)
     {
-
         if (string.IsNullOrWhiteSpace(application))
         {
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(application));
@@ -43,7 +43,5 @@ public class TestInfo
         Tags = tags;
         Name = name;
         Url = url ?? throw new ArgumentNullException(nameof(url));
-
     }
-
 }

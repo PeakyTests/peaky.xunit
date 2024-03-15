@@ -17,7 +17,7 @@ public class PeakyClientTests
             .WithContentAt("/tests", PeakyResponses.Tests);
         var client = new PeakyClient( new Uri(server.BaseAddress, "/tests"));
 
-        var tests = await client.GetTests();
+        var tests = await client.GetTestsAsync();
 
         tests.Should().HaveCount(15);
     }
@@ -35,7 +35,7 @@ public class PeakyClientTests
         });
         var client = new PeakyClient(new Uri(server.BaseAddress, @"/tests/test"));
 
-        await client.GetTests();
+        await client.GetTestsAsync();
 
         requestPath.Should().Be(@"/tests/test");
     }
@@ -47,7 +47,7 @@ public class PeakyClientTests
             .WithContentAt("/tests", PeakyResponses.Tests);
         var client = new PeakyClient(new Uri(server.BaseAddress, @"/tests"));
 
-        var tests = await client.GetTests();
+        var tests = await client.GetTestsAsync();
 
         var test = tests.First();
 
@@ -70,7 +70,7 @@ public class PeakyClientTests
 
         var test = new Test("", "", new Uri(server.BaseAddress, "/a_passing_test"), null);
 
-        var testResult = await client.GetResultFor(test);
+        var testResult = await client.GetTestResultAsync(test);
 
         testResult.Passed.Should().BeTrue();
         testResult.Test.Application.Should().Be("testApp");
@@ -88,7 +88,7 @@ public class PeakyClientTests
 
         var test = new Test("", "", new Uri(server.BaseAddress, "/a_failing_test"), null);
 
-        var testResult = await client.GetResultFor(test);
+        var testResult = await client.GetTestResultAsync(test);
 
         testResult.Passed.Should().BeFalse();
         testResult.Test.Application.Should().Be("testApp");
@@ -106,7 +106,7 @@ public class PeakyClientTests
 
         var test = new Test("", "", new Uri(server.BaseAddress, "/a_passing_test"), null);
 
-        var testResult = await client.GetResultFor(test.Url);
+        var testResult = await client.GetTestResultAsync(test.Url);
 
         testResult.Passed.Should().BeTrue();
         testResult.Passed.Should().BeTrue();
@@ -125,7 +125,7 @@ public class PeakyClientTests
 
         var test = new Test("", "", new Uri(server.BaseAddress, "/a_failing_test"), null);
 
-        var testResult = await client.GetResultFor(test.Url);
+        var testResult = await client.GetTestResultAsync(test.Url);
 
         testResult.Passed.Should().BeFalse();
 
@@ -143,7 +143,7 @@ public class PeakyClientTests
 
         var test = new Test("", "", new Uri(server.BaseAddress, "/a_failing_test"), null);
 
-        var testResult = await client.GetResultFor(test.Url, TimeSpan.Zero);
+        var testResult = await client.GetTestResultAsync(test.Url, TimeSpan.Zero);
 
         attempted.Should().BeTrue();
         testResult.Passed.Should().BeFalse();
@@ -158,7 +158,7 @@ public class PeakyClientTests
             .WithTestResultAt("/no_test", "hijklmnop", false);
         var client = new PeakyClient(new Uri(server.BaseAddress, @"/tests"));
 
-        var tests = await client.GetTests();
+        var tests = await client.GetTestsAsync();
 
         tests.Should().BeEmpty();
     }
@@ -191,8 +191,8 @@ public class PeakyClientTests
         {
             var client = new PeakyClient(server.BaseAddress);
 
-            await client.GetResultFor(new Uri(server.BaseAddress, "/tests/a_test"));
-            await client.GetResultFor(new Uri(server.BaseAddress, "/tests/a_test"));
+            await client.GetTestResultAsync(new Uri(server.BaseAddress, "/tests/a_test"));
+            await client.GetTestResultAsync(new Uri(server.BaseAddress, "/tests/a_test"));
         }
 
         receivedSessionIdOnSecondRequest.Should().BeTrue();

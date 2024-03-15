@@ -16,7 +16,7 @@ public class PeakySampleTests : PeakyXunitTestBase, IDisposable
     [ClassData(typeof(PeakySampleTests))]
     public async void The_peaky_test_passes(Uri url)
     {
-        var result = await PeakyClient.GetResultFor(url);
+        var result = await PeakyClient.GetTestResultAsync(url);
             
         result.Passed.Should().BeTrue();
     }
