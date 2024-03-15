@@ -13,7 +13,7 @@ public class PeakyClient : IDisposable
 {
     private readonly HttpClient _httpClient;
 
-    private readonly CompositeDisposable _disposables = new CompositeDisposable();
+    private readonly CompositeDisposable _disposables = new();
 
     public PeakyClient(Uri serviceUri)
     {
@@ -29,6 +29,11 @@ public class PeakyClient : IDisposable
 
         _disposables.Add(_httpClient);
         _disposables.Add(handler);
+    }
+
+    public PeakyClient(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
     }
 
     public async Task<IEnumerable<Test>> GetTests()
