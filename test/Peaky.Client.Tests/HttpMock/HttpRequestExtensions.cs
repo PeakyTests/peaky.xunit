@@ -2,7 +2,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Http;
 
-namespace FakeHttpService;
+namespace Peaky.Client.Tests.HttpMock;
 
 public static class HttpRequestExtensions 
 { 

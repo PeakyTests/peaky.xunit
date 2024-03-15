@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Features;
 using Pocket;
-using static Pocket.Logger<FakeHttpService.RequestLoggingMiddleware>;
+using static Pocket.Logger<Peaky.Client.Tests.HttpMock.RequestLoggingMiddleware>;
 
-namespace FakeHttpService;
+namespace Peaky.Client.Tests.HttpMock;
 
 public class RequestLoggingMiddleware
 {

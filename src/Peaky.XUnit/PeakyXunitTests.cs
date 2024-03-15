@@ -9,9 +9,9 @@ public class PeakyXunitTests
     public static IEnumerable<object[]> GetPeakyResults(string serviceUri)
     {
         using var client = new PeakyClient(new Uri(serviceUri));
-        foreach (var test in client.GetTests().Result)
+        foreach (var test in client.GetTestsAsync().Result)
         {
-            var result = client.GetResultFor(test).Result;
+            var result = client.GetTestResultAsync(test).Result;
 
             Console.WriteLine(result.GetType());
                     

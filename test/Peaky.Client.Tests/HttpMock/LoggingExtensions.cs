@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 
-namespace FakeHttpService;
+namespace Peaky.Client.Tests.HttpMock;
 
 internal static class LoggingExtensions
 {

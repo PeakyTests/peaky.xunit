@@ -7,5 +7,4 @@ public enum TestOutcome
     Inconclusive,
     Error,
     Timeout
-
 }

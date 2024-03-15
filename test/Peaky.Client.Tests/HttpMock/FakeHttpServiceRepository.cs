@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 
-namespace FakeHttpService;
+namespace Peaky.Client.Tests.HttpMock;
 
 public static class FakeHttpServiceRepository
 {

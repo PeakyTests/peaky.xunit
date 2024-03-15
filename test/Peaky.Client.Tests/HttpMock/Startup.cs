@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 
-namespace FakeHttpService;
+namespace Peaky.Client.Tests.HttpMock;
 
 public class Startup
 {

@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace FakeHttpService;
+namespace Peaky.Client.Tests.HttpMock;
 
 public class ResponseBuilder
 {
@@ -18,18 +18,19 @@ public class ResponseBuilder
         _fakeHttpService = fakeHttpService;
     }
 
-    public FakeHttpService RespondWith(Func<HttpResponse, Task> responseConfiguration)
+    public void RespondWith(Func<HttpResponse, Task> responseConfiguration)
     {
-        if (responseConfiguration == null) throw new ArgumentNullException(nameof(responseConfiguration));
+        if (responseConfiguration is null)
+        {
+            throw new ArgumentNullException(nameof(responseConfiguration));
+        }
+
+        _fakeHttpService.Setup(_requestValidator, ResponseFunction);
 
         async Task ResponseFunction(HttpResponse c)
         {
             await responseConfiguration(c);
         }
-
-        _fakeHttpService.Setup(_requestValidator, ResponseFunction);
-
-        return _fakeHttpService;
     }
 
     public FakeHttpService RespondWith(Func<HttpResponse, Uri, Task> responseConfiguration)
@@ -46,18 +47,18 @@ public class ResponseBuilder
         return _fakeHttpService;
     }
 
-    public FakeHttpService Succeed()
+    public void Succeed()
     {
-        return RespondWith(async r =>
+        RespondWith(async r =>
         {
             r.StatusCode = 200;
             await Task.Yield();
         });
     }
 
-    public FakeHttpService Fail()
+    public void Fail()
     {
-        return RespondWith(async r =>
+        RespondWith(async r =>
         {
             r.StatusCode = 500;
             await Task.Yield();
