@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -36,7 +37,7 @@ public class PeakyClient : IDisposable
         _httpClient = httpClient;
     }
 
-    public async Task<IEnumerable<Test>> GetTestsAsync()
+    public async Task<Test[]> GetTestsAsync()
     {
         var response = await _httpClient.GetAsync("");
 
@@ -44,12 +45,19 @@ public class PeakyClient : IDisposable
 
         var testResponse = JsonConvert.DeserializeObject<TestsResponse>(content);
 
-        if (testResponse == null)
+        if (testResponse is null)
         {
             return Array.Empty<Test>();
         }
 
-        return testResponse.Tests;
+        var tests = testResponse.Tests.ToArray();
+
+        foreach (var test in tests)
+        {
+            test.PeakyClient = this;
+        }
+
+        return tests;
     }
 
     public async Task<TestResult> GetTestResultAsync(Test test)

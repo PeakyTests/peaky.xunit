@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace FakeHttpService;
+namespace Peaky.Client.Tests.HttpMock;
 
 public class ConstantMemberEvaluationVisitor : ExpressionVisitor
 {

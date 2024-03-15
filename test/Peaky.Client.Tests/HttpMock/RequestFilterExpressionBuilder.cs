@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace FakeHttpService.FilterBuilders;
+namespace Peaky.Client.Tests.HttpMock.FilterBuilders;
 
 public static class RequestFilterExpressionBuilderExtensions
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace FakeHttpService.FilterBuilders;
+namespace Peaky.Client.Tests.HttpMock.FilterBuilders;
 
 internal static class ExpressionExtensions
 {

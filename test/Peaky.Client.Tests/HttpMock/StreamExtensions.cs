@@ -2,7 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FakeHttpService;
+namespace Peaky.Client.Tests.HttpMock;
 
 public static class StreamExtensions
 {
