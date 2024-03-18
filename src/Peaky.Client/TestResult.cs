@@ -2,6 +2,7 @@
 
 namespace Peaky.Client;
 
+[TypeFormatterSource(typeof(TypeFormatterSource))]
 public class TestResult
 {
     public TestOutcome Outcome { get; }
