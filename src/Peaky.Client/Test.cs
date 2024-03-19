@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 
 namespace Peaky.Client;
 
+[TypeFormatterSource(typeof(TypeFormatterSource))]
 public class Test
 {
     public Test(string application, string environment, Uri url, IEnumerable<string> tags = null)

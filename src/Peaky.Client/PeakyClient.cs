@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -37,7 +36,7 @@ public class PeakyClient : IDisposable
         _httpClient = httpClient;
     }
 
-    public async Task<Test[]> GetTestsAsync()
+    public async Task<TestList> GetTestsAsync()
     {
         var response = await _httpClient.GetAsync("");
 
@@ -47,17 +46,19 @@ public class PeakyClient : IDisposable
 
         if (testResponse is null)
         {
-            return Array.Empty<Test>();
+            return new();
         }
 
-        var tests = testResponse.Tests.ToArray();
+        var tests = testResponse.Tests;
+        var testList = new TestList();
 
         foreach (var test in tests)
         {
             test.PeakyClient = this;
+            testList.Add(test);
         }
 
-        return tests;
+        return testList;
     }
 
     public async Task<TestResult> GetTestResultAsync(Test test)
@@ -83,7 +84,7 @@ public class PeakyClient : IDisposable
                 return new TestResult(content, testOutcome);
             }
 
-            var maxMinutes = (int) (maxIntervalForRetrial?? TimeSpan.FromMinutes(10)).TotalMinutes;
+            var maxMinutes = (int)(maxIntervalForRetrial ?? TimeSpan.FromMinutes(10)).TotalMinutes;
             if (maxMinutes > 0)
             {
                 var waitInterval = random.Next(1, maxMinutes);
@@ -115,6 +116,7 @@ public class PeakyClient : IDisposable
         {
             outcome = responseStatusCode == HttpStatusCode.OK ? TestOutcome.Passed : TestOutcome.Failed;
         }
+
         return outcome;
     }
 
