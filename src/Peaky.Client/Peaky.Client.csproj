@@ -13,6 +13,8 @@
     <PackageProjectUrl>https://github.com/PeakyTests/peaky.xunit/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeakyTests/peaky.xunit.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\Peaky.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
