@@ -16,6 +16,8 @@
     <Product>Peaky.XUnit</Product>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/PeakyTests/peaky.xunit.git</RepositoryUrl>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\Peaky.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
