@@ -261,3 +261,5 @@ paket-files/
 
 # OS X
 .DS_Store
+
+.NCrunch_peaky.xunit/StoredText/

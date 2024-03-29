@@ -88,7 +88,7 @@ public class PeakyClient
         var content = await response.Content.ReadAsStringAsync();
         var testOutcome = ParseTestOutCome(response.StatusCode, content);
 
-        return new TestResult(content, testOutcome);
+        return new TestResult(content, testOutcome, this);
     }
 
     private TestOutcome ParseTestOutCome(HttpStatusCode responseStatusCode, string content)

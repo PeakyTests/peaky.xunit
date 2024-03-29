@@ -9,11 +9,18 @@ namespace Peaky.Client;
 [TypeFormatterSource(typeof(TypeFormatterSource))]
 public class Test
 {
-    public Test(string application, string environment, Uri url, IEnumerable<string> tags = null)
+    public Test(
+        string application, 
+        string environment, 
+        string name,
+        Uri url, 
+        IEnumerable<string> tags = null)
     {
         Application = application;
 
         Environment = environment;
+
+        Name = name;
 
         Url = url;
 
@@ -23,6 +30,8 @@ public class Test
     public string Application { get; }
 
     public string Environment { get; }
+
+    public string Name { get; }
 
     public Uri Url { get; }
 
