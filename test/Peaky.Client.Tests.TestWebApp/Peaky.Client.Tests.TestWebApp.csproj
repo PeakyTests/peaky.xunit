@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	  <DefaultNamespace>Peaky.Client.Tests.TestWebApp</DefaultNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="peaky" Version="4.0.77-beta" />
+  </ItemGroup>
+
+</Project>

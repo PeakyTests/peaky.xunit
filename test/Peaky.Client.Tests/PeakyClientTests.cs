@@ -1,197 +1,147 @@
-using System;
+﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
-using Peaky.Client.Tests.HttpMock;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Peaky.Client.Tests.TestWebApp;
 using Xunit;
 
 namespace Peaky.Client.Tests;
 
-public class PeakyClientTests
+public class PeakyClientTests : IClassFixture<WebApplicationFactory<Program>>
 {
-    [Fact]
-    public async void It_can_load_tests_from_a_Peaky_service_by_BaseAddress()
+    private readonly WebApplicationFactory<Program> _factory;
+    private readonly HttpClient _httpClient;
+
+    public PeakyClientTests(WebApplicationFactory<Program> factory)
     {
-        using var server = new FakeHttpService();
+        _factory = factory;
+        _httpClient = _factory.CreateClient();
+    }
 
-        for (int i = 0; i < 15; i++)
-        {
-            server.WithTestResultAt($"/{i}", PeakyResponses.CreatePassedTestResultsFor("abcdefg", "testApp", "test", "a passing test", "http://server.path/a_passing_test", "a", "b"), true);
-        }
-         
-        var client = new PeakyClient(new Uri(server.BaseAddress, "/tests"));
+    [Fact]
+    public async Task It_can_load_tests_from_a_Peaky_service_using_HttpClient()
+    {
+        var peakyClient = new PeakyClient(_httpClient);
 
-        var tests = await client.GetTestsAsync();
+        var tests = await peakyClient.GetTestsAsync();
 
-        tests.Should().HaveCount(15);
+        tests.Should().HaveCount(7);
     }
 
     [Fact]
     public async void It_retrieves_attributes_from_a_Peaky_service()
     {
-        using var server = new FakeHttpService();
-
-        var content = PeakyResponses.CreatePassedTestResultsFor("hello!", "bing", "prod", "a passing test", "http://server.path/a_passing_test", "LiveSite", "NonSideEffecting");
-
-        server.WithTestResultAt("/myTest", content, true, "bing", "prod", new[] { "LiveSite", "NonSideEffecting" });
-
-        var client = new PeakyClient(new Uri(server.BaseAddress, @"/tests"));
+        var client = new PeakyClient(_httpClient);
 
         var tests = await client.GetTestsAsync();
 
-        var test = tests.Single();
+        tests.Should().Contain(t => t.Application == "TestWebApp" &&
+                                    t.Environment == "production");
+        tests.Should().Contain(t => t.Application == "TestWebApp" &&
+                                    t.Environment == "staging");
 
-        test.Application.Should().Be("bing");
-
-        test.Environment.Should().Be("prod");
-
-        test.Tags.Should().BeEquivalentTo("LiveSite", "NonSideEffecting");
+        tests.Should().Contain(t => t.Tags.Contains("dependencies"));
     }
 
     [Fact]
     public async void It_retrieves_results_for_a_passing_test()
     {
-        using var server = new FakeHttpService()
-            .WithTestResultAt("/a_passing_test",
-                              PeakyResponses.CreatePassedTestResultsFor("abcdefg", "testApp", "test", "a passing test", "http://server.path/a_passing_test", "a", "b"), true);
-        var client = new PeakyClient(new Uri(server.BaseAddress, @"/tests"));
+        var client = new PeakyClient(_httpClient);
 
-        var tests = await client.GetTestsAsync();
-        var test = tests.Single(t => t.Url.ToString().EndsWith("/a_passing_test"));
+        var tests = await client.GetTestsAsync(environment: "staging");
+
+        var test = tests.First(t => t.Url.ToString().EndsWith("/this_test_passes"));
 
         var testResult = await test.GetResultAsync();
 
         testResult.Passed.Should().BeTrue();
-        testResult.Test.Application.Should().Be("testApp");
-        testResult.Test.Environment.Should().Be("test");
-        testResult.Test.Tags.Should().BeEquivalentTo("a", "b");
-        testResult.Content.Should().Contain("abcdefg");
+        testResult.Test.Application.Should().Be("TestWebApp");
+        testResult.Test.Environment.Should().Be("staging");
+        testResult.Test.Tags.Should().BeEquivalentTo("self");
+        testResult.Content.Should().Contain("OK!");
     }
 
     [Fact]
     public async void It_retrieves_results_for_a_failing_test()
     {
-        using var server = new FakeHttpService()
-            .WithTestResultAt("/a_failing_test",
-                              PeakyResponses.CreateFailedTestResultsFor(new Exception("jijij"), "testApp", "test", "a failing test", "http://server.path/a_failing_test", "a", "b"),
-                              false);
-        var client = new PeakyClient(new Uri(server.BaseAddress, @"/tests"));
+        var client = new PeakyClient(_httpClient);
 
-        var test = (await client.GetTestsAsync()).Single(t => t.Url.ToString().EndsWith("/a_failing_test"));
+        var test = (await client.GetTestsAsync(environment: "staging")).Single(t => t.Url.ToString().EndsWith("/this_test_fails_in_staging"));
 
         var testResult = await test.GetResultAsync();
 
         testResult.Passed.Should().BeFalse();
-        testResult.Test.Application.Should().Be("testApp");
-        testResult.Test.Environment.Should().Be("test");
-        testResult.Test.Tags.Should().BeEquivalentTo("a", "b");
-        testResult.Content.Should().Contain("jijij");
+        testResult.Test.Application.Should().Be("TestWebApp");
+        testResult.Test.Environment.Should().Be("staging");
+        testResult.Test.Tags.Should().BeEquivalentTo("self");
+        testResult.Content.Should().Contain("oops!");
     }
 
     [Fact]
-    public async void It_retrieves_results_for_a_passing_test_Url()
+    public async void It_retrieves_results_for_a_passing_test_by_url()
     {
-        using var server = new FakeHttpService()
-            .WithTestResultAt("/a_passing_test",
-                              PeakyResponses.CreatePassedTestResultsFor("abcdefg", "testApp", "test", "a passing test", "http://server.path/a_passing_test", "a", "b"), true);
-        var client = new PeakyClient(new Uri(server.BaseAddress, @"/tests"));
+        var client = new PeakyClient(_httpClient);
 
-        var test = (await client.GetTestsAsync()).Single(t => t.Url.ToString().EndsWith("/a_passing_test"));
+        var tests = await client.GetTestsAsync(environment: "staging");
+
+        var test = tests.First(t => t.Url.ToString().EndsWith("/this_test_passes"));
 
         var testResult = await client.GetTestResultAsync(test.Url);
 
         testResult.Passed.Should().BeTrue();
-        testResult.Passed.Should().BeTrue();
-        testResult.Test.Application.Should().Be("testApp");
-        testResult.Test.Environment.Should().Be("test");
-        testResult.Test.Tags.Should().BeEquivalentTo("a", "b");
-        testResult.Content.Should().Contain("abcdefg");
+        testResult.Test.Application.Should().Be("TestWebApp");
+        testResult.Test.Environment.Should().Be("staging");
+        testResult.Test.Tags.Should().BeEquivalentTo("self");
+        testResult.Content.Should().Contain("OK!");
     }
 
     [Fact]
-    public async void It_retrieves_results_for_a_failing_test_Url()
+    public async void It_retrieves_results_for_a_failing_test_by_url()
     {
-        using var server = new FakeHttpService()
-            .WithTestResultAt("/a_failing_test",
-                              PeakyResponses.CreateFailedTestResultsFor(new Exception("hijklmnop"), "testApp", "test", "a failing test", "http://server.path/a_failing_test", "a",
-                                                                        "b"), false);
-        var client = new PeakyClient(new Uri(server.BaseAddress, @"/tests"));
+        var client = new PeakyClient(_httpClient);
 
-        var test = (await client.GetTestsAsync()).Single(t => t.Url.ToString().EndsWith("/a_failing_test"));
+        var test = (await client.GetTestsAsync(environment: "staging")).Single(t => t.Url.ToString().EndsWith("/this_test_fails_in_staging"));
 
         var testResult = await client.GetTestResultAsync(test.Url);
 
         testResult.Passed.Should().BeFalse();
-
-        testResult.Content.Should().Contain("hijklmnop");
-    }
-
-    [Fact]
-    public async void It_retrieves_results_for_a_failing_test_Url_and_performs_another_attempt()
-    {
-        var attempted = false;
-        using var server = new FakeHttpService()
-            .WithRetriableTestResultAt(
-                "/a_failing_test",
-                PeakyResponses.CreateFailedRetriableTestResultsFor(new Exception("hijklmnop"), "testApp", "test", "a failing test", "http://server.path/a_failing_test", "a", "b"),
-                false, () => attempted = true);
-        var client = new PeakyClient(new Uri(server.BaseAddress, @"/tests"));
-
-        var test = (await client.GetTestsAsync()).Single(t => t.Url.ToString().EndsWith("/a_failing_test"));
-
-        var testResult = await client.GetTestResultAsync(test.Url, TimeSpan.Zero);
-
-        attempted.Should().BeTrue();
-        testResult.Passed.Should().BeFalse();
-
-        testResult.Content.Should().Contain("hijklmnop");
+        testResult.Test.Application.Should().Be("TestWebApp");
+        testResult.Test.Environment.Should().Be("staging");
+        testResult.Test.Tags.Should().BeEquivalentTo("self");
+        testResult.Content.Should().Contain("oops!");
     }
 
     [Fact]
     public async void When_the_response_contains_no_peaky_tests_Then_it_returns_an_empty_list()
     {
-        using var server = new FakeHttpService();
+        var client = new PeakyClient(_httpClient);
 
-        var client = new PeakyClient(new Uri(server.BaseAddress, @"/tests"));
-
-        var tests = await client.GetTestsAsync();
+        var tests = await client.GetTestsAsync(application: "nonexistent");
 
         tests.Should().BeEmpty();
     }
 
     [Fact]
-    public async Task It_returns_the_Peaky_session_cookie_on_subsequent_requests()
+    public async Task It_can_filter_tests_by_application()
     {
-        var requestCount = 0;
-        var sessionId = Guid.NewGuid().ToString();
-        var receivedSessionIdOnSecondRequest = false;
+        var client = new PeakyClient(_httpClient);
 
-        using var server = new FakeHttpService();
+        var tests = await client.GetTestsAsync(application: "testuri");
 
-        server.OnRequest(_ => true)
-              .RespondWith(async response =>
-              {
-                  await response.WriteAsync("{}");
-                  if (requestCount == 0)
-                  {
-                      requestCount++;
-                      response.Cookies.Append("peaky-session", sessionId);
-                  }
-                  else
-                  {
-                      if (response.HttpContext.Request.Cookies.TryGetValue("peaky-session", out var value))
-                      {
-                          receivedSessionIdOnSecondRequest = value == sessionId;
-                      }
-                  }
-              });
+        tests.Should().HaveCount(1);
+    }
 
-        var client = new PeakyClient(server.BaseAddress);
+    [Fact]
+    public async Task It_can_filter_tests_by_environment()
+    {
+        var client = new PeakyClient(_httpClient);
 
-        await client.GetTestResultAsync(new Uri(server.BaseAddress, "/tests/a_test"));
-        await client.GetTestResultAsync(new Uri(server.BaseAddress, "/tests/a_test"));
+        var tests = await client.GetTestsAsync(environment: "production");
 
-        receivedSessionIdOnSecondRequest.Should().BeTrue();
+        tests.Should().HaveCount(3);
     }
 }

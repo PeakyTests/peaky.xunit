@@ -141,7 +141,7 @@ public class PeakyResponses
         }";
 
 
-    public static string CreateFailedTestResultsFor(Exception error, string application, string environment, string testName, string testUrl, params string[] tags)
+    public static string CreateFailedTestResultJson(Exception error, string application, string environment, string testName, string testUrl, params string[] tags)
     {
         var obj = new JObject
         {
@@ -160,7 +160,7 @@ public class PeakyResponses
         return obj.ToString();
     }
 
-    public static string CreateFailedRetriableTestResultsFor(Exception error, string application, string environment, string testName, string testUrl, params string[] tags)
+    public static string CreateFailedRetriableTestResultJson(Exception error, string application, string environment, string testName, string testUrl, params string[] tags)
     {
         var obj = new JObject
         {
@@ -180,7 +180,7 @@ public class PeakyResponses
         return obj.ToString();
     }
 
-    public static string CreatePassedTestResultsFor(object result, string application, string environment, string testName, string testUrl, params string[] tags)
+    public static string CreatePassedTestResultJson(object result, string application, string environment, string testName, string testUrl, params string[] tags)
     {
         var obj = new JObject
         {

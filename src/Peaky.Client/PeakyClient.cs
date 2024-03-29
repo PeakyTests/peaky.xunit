@@ -4,40 +4,57 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Pocket;
 
 namespace Peaky.Client;
 
-public class PeakyClient : IDisposable
+public class PeakyClient
 {
+    private static readonly Lazy<HttpClient> _staticHttpClient;
+
     private readonly HttpClient _httpClient;
+    private readonly Uri _testRootUri;
 
-    private readonly CompositeDisposable _disposables = new();
-
-    public PeakyClient(Uri serviceUri)
+    static PeakyClient()
     {
-        var handler = new HttpClientHandler
+        _staticHttpClient = new Lazy<HttpClient>(() =>
         {
-            CookieContainer = new CookieContainer()
-        };
+            var handler = new HttpClientHandler
+            {
+                CookieContainer = new CookieContainer()
+            };
+            return new(handler);
+        });
+    }
 
-        _httpClient = new HttpClient(handler)
-        {
-            BaseAddress = serviceUri
-        };
-
-        _disposables.Add(_httpClient);
-        _disposables.Add(handler);
+    public PeakyClient(Uri testRootUri)
+    {
+        _testRootUri = testRootUri;
+        _httpClient = _staticHttpClient.Value;
     }
 
     public PeakyClient(HttpClient httpClient)
     {
         _httpClient = httpClient;
+        _testRootUri = new(_httpClient.BaseAddress ?? throw new ArgumentException("HttpClient.BaseAddress must be specified"), "/tests");
     }
 
-    public async Task<TestList> GetTestsAsync()
+    public async Task<TestList> GetTestsAsync(
+        string application = null,
+        string environment = null)
     {
-        var response = await _httpClient.GetAsync("");
+        var uri = _testRootUri.ToString();
+
+        if (environment is not null)
+        {
+            uri += $"/{environment}";
+        }
+
+        if (application is not null)
+        {
+            uri += $"/{application}";
+        }
+
+        var response = await _httpClient.GetAsync(uri);
 
         var content = await response.Content.ReadAsStringAsync();
 
@@ -65,35 +82,11 @@ public class PeakyClient : IDisposable
         return await GetTestResultAsync(test.Url);
     }
 
-    public async Task<TestResult> GetTestResultAsync(Uri url, TimeSpan? maxIntervalForRetrial = null)
+    public async Task<TestResult> GetTestResultAsync(Uri url)
     {
-        var currentAttempt = 1;
-        const int maxAttempts = 10;
-        var random = new Random();
         var response = await _httpClient.GetAsync(url);
         var content = await response.Content.ReadAsStringAsync();
         var testOutcome = ParseTestOutCome(response.StatusCode, content);
-        while (response.StatusCode == HttpStatusCode.ServiceUnavailable && currentAttempt < maxAttempts)
-        {
-            var parsed = JObject.Parse(content);
-            var supportsRetry = (parsed["SupportsRetry"] ?? parsed["supportsRetry"])?.Value<bool>() == true;
-
-            if (!supportsRetry)
-            {
-                return new TestResult(content, testOutcome);
-            }
-
-            var maxMinutes = (int)(maxIntervalForRetrial ?? TimeSpan.FromMinutes(10)).TotalMinutes;
-            if (maxMinutes > 0)
-            {
-                var waitInterval = random.Next(1, maxMinutes);
-                await Task.Delay(TimeSpan.FromMinutes(waitInterval));
-            }
-
-            currentAttempt++;
-            response = await _httpClient.GetAsync(url);
-            content = await response.Content.ReadAsStringAsync();
-        }
 
         return new TestResult(content, testOutcome);
     }
@@ -117,10 +110,5 @@ public class PeakyClient : IDisposable
         }
 
         return outcome;
-    }
-
-    public void Dispose()
-    {
-        _disposables.Dispose();
     }
 }
