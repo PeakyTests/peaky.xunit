@@ -5,17 +5,22 @@ namespace Peaky.Client;
 [TypeFormatterSource(typeof(TypeFormatterSource))]
 public class TestResult
 {
-    public TestOutcome Outcome { get; }
-
-    public TestInfo Test { get; }
-
-    public TestResult(string content, TestOutcome outcome)
+    public TestResult(string content, TestOutcome outcome, PeakyClient client)
     {
         Content = content;
         Outcome = outcome;
         var parsed = JObject.Parse(content);
-        Test = (parsed["Test"] ?? parsed["test"])?.ToObject<TestInfo>();
+        Test = (parsed["Test"] ?? parsed["test"])?.ToObject<Test>();
+
+        if (Test is not null)
+        {
+            Test.PeakyClient = client;
+        }
     }
+
+    public TestOutcome Outcome { get; }
+
+    public Test Test { get; }
 
     public string Content { get; }
 

@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.Json;
 using System.Web;
+using Newtonsoft.Json;
 using static System.Net.WebUtility;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Peaky.Client;
 
@@ -23,38 +27,89 @@ internal class TypeFormatterSource
     {
         yield return new TestResultPlainTextFormatter();
         yield return new TestResultHtmlFormatter();
-        yield return new TestInfoHtmlFormatter();
+
+        yield return new TestHtmlFormatter();
+
+        yield return new TestListHtmlFormatter();
     }
 }
 
-internal class TestInfoHtmlFormatter
+internal class TestListHtmlFormatter
 {
+    public string MimeType => "text/html";
+
     public bool Format(object instance, TextWriter writer)
     {
-        if (instance is not TestInfo info)
+        if (instance is not TestList testList)
         {
             return false;
         }
 
-        WriteTestInfo(info, writer);
+        WriteTestList(testList, writer);
 
         return true;
     }
 
-    public static void WriteTestInfo(TestInfo test, TextWriter textWriter)
+    public static void WriteTestList(TestList tests, TextWriter writer)
+    {
+        foreach (var environment in tests.Select(t => t.Environment).Distinct())
+        {
+            var testsForEnvironment = tests.Where(t => t.Environment == environment).ToArray();
+
+            var testCount = testsForEnvironment.Length switch
+            {
+                1 => "1 test",
+                _ => testsForEnvironment.Length + " tests"
+            };
+
+            writer.WriteLine($"""
+                <div>
+                    <h2>{environment} ({testCount})</h2>
+                """);
+
+            foreach (var test in testsForEnvironment)
+            {
+                TestHtmlFormatter.WriteTest(test, writer);
+            }
+
+            writer.WriteLine("""
+                </div>
+                """);
+        }
+    }
+}
+
+internal class TestHtmlFormatter
+{
+    public string MimeType => "text/html";
+
+    public bool Format(object instance, TextWriter writer)
+    {
+        if (instance is not Test test)
+        {
+            return false;
+        }
+
+        WriteTest(test, writer);
+
+        return true;
+    }
+
+    public static void WriteTest(Test test, TextWriter writer)
     {
         var urlString = test.Url.ToString();
 
-        textWriter.Write($"""
-            <div>
-            <a href="{HttpUtility.HtmlAttributeEncode(urlString)}">{HtmlEncode(urlString)}</a>
-            <br/>
-            Application: {test.Application}
-            <br/>
-            Environment: {test.Environment}
-            <br/>
-            Tags: {string.Join(",", test.Tags)}
-            </div>
+        writer.Write($"""
+            <details>
+                <summary>🧪<a href="{HttpUtility.HtmlAttributeEncode(urlString)}">{HtmlEncode(urlString)}</a></summary>
+                <div style="display:inline-block;margin-left:3em;">
+                    Application: {test.Application}
+                    <br/>
+                    Environment: {test.Environment}
+                    <br/>
+                    Tags: {string.Join(",", test.Tags)}
+                </div>
+            </details>
             """);
     }
 }
@@ -109,12 +164,43 @@ internal class TestResultHtmlFormatter
         writer.Write("<details>");
         writer.Write($"<summary>{HtmlEncode(summary)}</summary>");
 
-        TestInfoHtmlFormatter.WriteTestInfo(result.Test, writer);
+        TestHtmlFormatter.WriteTest(result.Test, writer);
 
-        writer.Write($"<pre>{HtmlEncode(result.Content)}</pre>");
+        var content = result.Content;
+
+        if (TryIndentJson(content, out var formattedJson))
+        {
+            content = formattedJson;
+        }
+
+        writer.Write($"<pre>{HtmlEncode(content)}</pre>");
 
         writer.Write("</details>");
 
         return true;
+
+        static bool TryIndentJson(string content, out string formattedJson)
+        {
+            try
+            {
+                using var json = JsonDocument.Parse(content);
+
+                formattedJson = JsonSerializer.Serialize(
+                    json.RootElement,
+                    new
+                        JsonSerializerOptions
+                        {
+                            WriteIndented = true
+                        });
+
+                return true;
+            }
+            catch
+            {
+                formattedJson = null;
+                return false;
+            }
+
+        }
     }
 }

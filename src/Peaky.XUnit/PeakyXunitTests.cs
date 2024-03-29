@@ -8,7 +8,8 @@ public class PeakyXunitTests
 {
     public static IEnumerable<object[]> GetPeakyResults(string serviceUri)
     {
-        using var client = new PeakyClient(new Uri(serviceUri));
+        var client = new PeakyClient(new Uri(serviceUri));
+        
         foreach (var test in client.GetTestsAsync().Result)
         {
             var result = client.GetTestResultAsync(test).Result;
