@@ -11,7 +11,7 @@ public class TestResult
         Outcome = outcome;
         var parsed = JObject.Parse(content);
         Test = (parsed["Test"] ?? parsed["test"])?.ToObject<Test>();
-        Test.PeakyClient = client;
+        Test?.PeakyClient = client;
     }
 
     public TestOutcome Outcome { get; }
